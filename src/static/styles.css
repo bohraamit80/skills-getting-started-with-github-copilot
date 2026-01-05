@@ -70,57 +70,68 @@ section h3 {
   color: #0066cc;
 }
 
-.activity-card p {
-  margin-bottom: 8px;
+/* New participants styles */
+.participants {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed #eceff1;
 }
 
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-group label {
+.participants strong {
   display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
+  margin-bottom: 8px;
+  color: #1a237e;
 }
 
-.form-group input,
-.form-group select {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 16px;
+.participants-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 160px;
+  overflow: auto;
 }
 
-button {
-  background-color: #1a237e;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  font-size: 16px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.2s;
+.participant-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #f1f3f5;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.02);
 }
 
-button:hover {
-  background-color: #3949ab;
+.participant-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background-color: #e3f2fd;
+  color: #0d47a1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
 }
 
-.message {
-  margin-top: 20px;
-  padding: 10px;
-  border-radius: 4px;
+.participant-name {
+  font-size: 14px;
+  color: #444;
+  word-break: break-word;
 }
 
-.success {
+/* Message classes should keep 'message' base when reused */
+.message.success {
   background-color: #e8f5e9;
   color: #2e7d32;
   border: 1px solid #a5d6a7;
 }
 
-.error {
+.message.error {
   background-color: #ffebee;
   color: #c62828;
   border: 1px solid #ef9a9a;
