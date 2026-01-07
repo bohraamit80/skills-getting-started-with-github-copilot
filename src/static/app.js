@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+    const participantsList = document.getElementById("participants");
   const activitiesList = document.getElementById("activities-list");
   const activitySelect = document.getElementById("activity");
   const signupForm = document.getElementById("signup-form");
@@ -22,6 +23,50 @@ document.addEventListener("DOMContentLoaded", () => {
       // Clear loading message and activity select options
       activitiesList.innerHTML = "";
       activitySelect.innerHTML = '<option value="">-- Select an activity --</option>';
+
+      // Build global participants list
+      const allParticipants = [];
+      Object.entries(activities).forEach(([activityName, details]) => {
+        if (details.participants && details.participants.length > 0) {
+          details.participants.forEach(email => {
+            allParticipants.push({ email, activity: activityName });
+          });
+        }
+      });
+      participantsList.innerHTML = "";
+      if (allParticipants.length === 0) {
+        participantsList.innerHTML = '<li style="color:#666;font-size:14px;">No participants yet</li>';
+      } else {
+        allParticipants.forEach(({ email, activity }) => {
+          const li = document.createElement('li');
+          li.style.display = 'flex';
+          li.style.alignItems = 'center';
+          // Avatar
+          const initials = getInitials(email);
+          const avatar = document.createElement('span');
+          avatar.className = 'participant-avatar';
+          avatar.textContent = initials;
+          // Name
+          const nameSpan = document.createElement('span');
+          nameSpan.className = 'participant-name';
+          nameSpan.textContent = email + ' (' + activity + ')';
+          // Delete icon
+          const deleteBtn = document.createElement('button');
+          deleteBtn.innerHTML = '🗑️';
+          deleteBtn.title = 'Unregister participant';
+          deleteBtn.style.marginLeft = '8px';
+          deleteBtn.style.background = 'none';
+          deleteBtn.style.border = 'none';
+          deleteBtn.style.cursor = 'pointer';
+          deleteBtn.onclick = function() {
+            unregisterParticipant(activity, email);
+          };
+          li.appendChild(avatar);
+          li.appendChild(nameSpan);
+          li.appendChild(deleteBtn);
+          participantsList.appendChild(li);
+        });
+      }
 
       // Populate activities list
       Object.entries(activities).forEach(([name, details]) => {
@@ -116,36 +161,41 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize app
   fetchActivities();
 
-  // Delegate click event for delete icons
+  // Delegate click event for delete icons in activity cards
   activitiesList.addEventListener("click", async (event) => {
     const target = event.target;
     if (target.classList.contains("delete-participant")) {
       const activity = target.getAttribute("data-activity");
       const email = target.getAttribute("data-email");
       if (activity && email) {
-        try {
-          const response = await fetch(`/activities/${encodeURIComponent(activity)}/unregister?email=${encodeURIComponent(email)}`, {
-            method: "POST"
-          });
-          const result = await response.json();
-          if (response.ok) {
-            messageDiv.textContent = result.message;
-            messageDiv.className = "message success";
-            await fetchActivities();
-          } else {
-            messageDiv.textContent = result.detail || "An error occurred";
-            messageDiv.className = "message error";
-          }
-          messageDiv.classList.remove("hidden");
-          setTimeout(() => {
-            messageDiv.classList.add("hidden");
-          }, 5000);
-        } catch (error) {
-          messageDiv.textContent = "Failed to remove participant. Please try again.";
-          messageDiv.className = "message error";
-          messageDiv.classList.remove("hidden");
-        }
+        await unregisterParticipant(activity, email);
       }
     }
   });
+
+  // Unregister participant helper for both global and card lists
+  async function unregisterParticipant(activity, email) {
+    try {
+      const response = await fetch(`/activities/${encodeURIComponent(activity)}/unregister?email=${encodeURIComponent(email)}`, {
+        method: "POST"
+      });
+      const result = await response.json();
+      if (response.ok) {
+        messageDiv.textContent = result.message;
+        messageDiv.className = "message success";
+        await fetchActivities();
+      } else {
+        messageDiv.textContent = result.detail || "An error occurred";
+        messageDiv.className = "message error";
+      }
+      messageDiv.classList.remove("hidden");
+      setTimeout(() => {
+        messageDiv.classList.add("hidden");
+      }, 5000);
+    } catch (error) {
+      messageDiv.textContent = "Failed to remove participant. Please try again.";
+      messageDiv.className = "message error";
+      messageDiv.classList.remove("hidden");
+    }
+  }
 });
