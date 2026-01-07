@@ -36,10 +36,10 @@ document.addEventListener("DOMContentLoaded", () => {
           const items = details.participants
             .map((p) => {
               const initials = getInitials(p);
-              return `<li class="participant-item"><span class="participant-avatar">${initials}</span><span class="participant-name">${p}</span></li>`;
+              return `<div class="participant-item"><span class="participant-avatar">${initials}</span><span class="participant-name">${p}</span><span class="delete-participant" title="Remove" data-activity="${name}" data-email="${p}">🗑️</span></div>`;
             })
             .join("");
-          participantsHtml = `<ul class="participants-list">${items}</ul>`;
+          participantsHtml = `<div class="participants-list">${items}</div>`;
         } else {
           participantsHtml = `<p class="participants-empty" style="color:#666;font-size:14px;">No participants yet</p>`;
         }
@@ -115,4 +115,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Initialize app
   fetchActivities();
+
+  // Delegate click event for delete icons
+  activitiesList.addEventListener("click", async (event) => {
+    const target = event.target;
+    if (target.classList.contains("delete-participant")) {
+      const activity = target.getAttribute("data-activity");
+      const email = target.getAttribute("data-email");
+      if (activity && email) {
+        try {
+          const response = await fetch(`/activities/${encodeURIComponent(activity)}/unregister?email=${encodeURIComponent(email)}`, {
+            method: "POST"
+          });
+          const result = await response.json();
+          if (response.ok) {
+            messageDiv.textContent = result.message;
+            messageDiv.className = "message success";
+            await fetchActivities();
+          } else {
+            messageDiv.textContent = result.detail || "An error occurred";
+            messageDiv.className = "message error";
+          }
+          messageDiv.classList.remove("hidden");
+          setTimeout(() => {
+            messageDiv.classList.add("hidden");
+          }, 5000);
+        } catch (error) {
+          messageDiv.textContent = "Failed to remove participant. Please try again.";
+          messageDiv.className = "message error";
+          messageDiv.classList.remove("hidden");
+        }
+      }
+    }
+  });
 });

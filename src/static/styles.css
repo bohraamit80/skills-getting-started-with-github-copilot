@@ -84,14 +84,26 @@ section h3 {
 }
 
 .participants-list {
-  list-style: none;
+  /* Hide bullet points and style participant list */
+  list-style-type: none;
+  margin-left: 0;
   padding: 0;
-  margin: 0;
   display: flex;
   flex-direction: column;
   gap: 8px;
   max-height: 160px;
   overflow: auto;
+}
+.delete-participant {
+  cursor: pointer;
+  color: #c00;
+  margin-left: 8px;
+  font-size: 18px;
+  transition: color 0.2s;
+}
+.delete-participant:hover {
+  color: #900;
+}
 }
 
 .participant-item {
