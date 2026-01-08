@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
         messageDiv.className = "message success";
         signupForm.reset();
 
-        // Refresh activities to show the new participant and updated availability
+        // Ensure UI updates immediately after registration
         await fetchActivities();
       } else {
         messageDiv.textContent = result.detail || "An error occurred";
